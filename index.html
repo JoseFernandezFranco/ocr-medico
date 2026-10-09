@@ -17,10 +17,6 @@
   --ok:#4cc38a;--ok-fondo:#15301f;--duda:#f5a524;--duda-fondo:#33260f;--no:#f97066;--no-fondo:#3a1715;--corr:#8fa2ff;--corr-fondo:#1f2547;color-scheme:dark}}
 :root[data-theme="dark"]{--fondo:#12161b;--panel:#1b2128;--texto:#e7eaee;--suave:#9aa5b1;--borde:#2c343e;--primario:#4f8fd0;--primario-txt:#0b1520;
   --ok:#4cc38a;--ok-fondo:#15301f;--duda:#f5a524;--duda-fondo:#33260f;--no:#f97066;--no-fondo:#3a1715;--corr:#8fa2ff;--corr-fondo:#1f2547;color-scheme:dark}
-#confirmar{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
-#confirmar[hidden]{display:none}
-#confirmar .tarjeta{max-width:420px;width:100%;margin:0}
-button:focus-visible,label:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--primario);outline-offset:2px}
 *{box-sizing:border-box}
 body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
@@ -31,20 +27,21 @@ main{max-width:640px;margin:0 auto;padding:16px}
 section[hidden]{display:none}
 .tarjeta{background:var(--panel);border:1px solid var(--borde);border-radius:12px;padding:16px;margin-bottom:14px}
 h2{font-size:17px;margin:0 0 10px}
-.cifra{font-size:34px;font-weight:700;line-height:1}
+.cifra{font-size:34px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
 .suave{color:var(--suave);font-size:14px}
 button.grande,label.grande,a.grande{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border-radius:12px;border:0;
-  font-size:17px;font-weight:600;background:var(--primario);color:var(--primario-txt);margin:8px 0;cursor:pointer;text-align:center}
-button.sec,label.sec{background:var(--panel);color:var(--texto);border:1px solid var(--borde)}
+  font-size:17px;font-weight:600;background:var(--primario);color:var(--primario-txt);margin:8px 0;cursor:pointer;text-align:center;text-decoration:none}
+button.sec,label.sec,a.sec{background:var(--panel);color:var(--texto);border:1px solid var(--borde)}
 button.peligro{background:var(--no-fondo);color:var(--no);border:1px solid var(--no)}
+button.peq{min-height:40px;padding:6px 12px;border-radius:8px;font-size:14px;font-weight:600;background:var(--panel);color:var(--texto);border:1px solid var(--borde);cursor:pointer}
 button:disabled{opacity:.5}
+button:focus-visible,label:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--primario);outline-offset:2px}
 input[type=file]{display:none}
-.fila{display:flex;gap:8px}.fila>*{flex:1}
-ul.paginas{list-style:none;padding:0;margin:0}
-ul.paginas li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--borde);gap:8px}
-.chip{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.fila{display:flex;gap:8px}.fila>*{flex:1;min-width:0}
+.chip{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;display:inline-block}
 .ok{color:var(--ok);background:var(--ok-fondo)}.dudoso{color:var(--duda);background:var(--duda-fondo)}
 .no_encontrado{color:var(--no);background:var(--no-fondo)}.corregido{color:var(--corr);background:var(--corr-fondo)}
+.neutro{color:var(--suave);background:var(--fondo);border:1px solid var(--borde)}
 .aviso{border-radius:10px;padding:12px;margin:10px 0;font-weight:600}
 .var{padding:12px 0;border-bottom:1px solid var(--borde)}
 .var:last-child{border-bottom:0}
@@ -52,15 +49,52 @@ ul.paginas li{display:flex;justify-content:space-between;align-items:center;padd
 .var .nombre{font-weight:600;font-size:15px;word-break:break-word}
 .var input{width:100%;font-size:18px;padding:8px 10px;margin:6px 0 4px;border:1px solid var(--borde);border-radius:8px;background:var(--fondo);color:var(--texto)}
 .var .evid{font-size:13px;color:var(--suave);word-break:break-word}
-textarea{width:100%;font:15px/1.4 inherit;padding:10px;border:1px solid var(--borde);border-radius:8px;background:var(--fondo);color:var(--texto)}
+textarea,.campo input,.campo select{width:100%;font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:10px;border:1px solid var(--borde);
+  border-radius:8px;background:var(--fondo);color:var(--texto)}
+.campo{display:block;margin:12px 0}
+.campo>span{display:block;font-weight:600;font-size:15px;margin-bottom:4px}
+.campo small{display:block;color:var(--suave);font-size:13px;margin-top:4px}
 pre{white-space:pre-wrap;font-size:12px;max-height:50vh;overflow:auto;background:var(--fondo);padding:10px;border-radius:8px}
-progress{width:100%;height:10px}
 #toast{position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));max-width:600px;margin:0 auto;background:var(--texto);color:var(--fondo);
-  padding:14px 16px;border-radius:12px;font-weight:600;text-align:center;opacity:0;transform:translateY(20px);transition:.25s;pointer-events:none}
+  padding:14px 16px;border-radius:12px;font-weight:600;text-align:center;opacity:0;transform:translateY(20px);transition:.25s;pointer-events:none;z-index:20}
 #toast.ver{opacity:1;transform:none}
-table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;border-bottom:1px solid var(--borde)}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
 .interruptor{display:flex;align-items:center;gap:10px;padding:8px 0}
 .interruptor input{width:22px;height:22px}
+/* Lista de informes / variables */
+.lista{list-style:none;padding:0;margin:0}
+.lista li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--borde)}
+.lista li:last-child{border-bottom:0}
+.lista .info{min-width:0;flex:1}
+.lista .titulo{font-weight:600}
+.lista .det{font-size:13px;color:var(--suave);display:flex;flex-wrap:wrap;gap:6px;margin-top:3px;align-items:center}
+.lista .acciones{display:flex;gap:6px;flex-shrink:0}
+/* Informe en curso */
+.encurso{border:2px solid var(--primario)}
+.encurso .num{font-size:28px;font-weight:700}
+.fotos{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#confirmar{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+#confirmar[hidden]{display:none}
+#confirmar .tarjeta{max-width:420px;width:100%;margin:0}
+/* Modo vídeo: siempre oscuro, como el visor de cámara del móvil */
+#camara{position:fixed;inset:0;background:#000;color:#fff;z-index:15;display:flex;flex-direction:column}
+#camara[hidden]{display:none}
+#camara video{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
+#cam-arriba{padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:rgba(0,0,0,.6);display:flex;justify-content:space-between;align-items:center;gap:10px}
+#cam-info{font-weight:700;font-size:17px}
+#cam-fotos{font-size:13px;color:#cfd6de}
+#cam-estado{padding:10px 16px;text-align:center;font-weight:600;font-size:16px;background:#1b2128}
+#cam-estado.ok{background:#137a45;color:#fff}#cam-estado.aviso{background:#9a5300;color:#fff}#cam-estado.espera{background:#1b2128;color:#fff}
+#cam-abajo{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#000}
+#cam-abajo button{min-height:56px;border-radius:12px;font-size:16px;font-weight:600;border:1px solid #3a434e;background:#1b2128;color:#fff;cursor:pointer}
+#cam-abajo #cam-siguiente{background:#4f8fd0;color:#0b1520;border:0}
+#cam-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .35s}
+#cam-flash.ver{opacity:.7;transition:none}
+#cam-auto{display:flex;align-items:center;gap:8px;font-size:14px}
+#cam-auto input{width:20px;height:20px}
+#esperando{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+#esperando[hidden]{display:none}
+#esperando .tarjeta{max-width:420px;width:100%;margin:0;text-align:center}
 </style>
 </head>
 <body>
@@ -75,32 +109,44 @@ table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;bord
       <div><div class="cifra" id="n-dudas">0</div><div class="suave">con datos a revisar</div></div>
     </div>
   </div>
-  <label class="grande" for="in-foto">📷 Nuevo informe: hacer foto</label>
-  <label class="grande sec" for="in-archivo">📄 Desde captura, imagen o PDF</label>
-  <button class="grande sec" data-pegar>📋 Pegar texto del informe</button>
+  <button class="grande" data-video hidden>🎥 Escanear en vídeo</button>
+  <label class="grande" for="in-foto" id="l-empezar-foto">📷 Empezar a escanear</label>
+  <div class="fila">
+    <label class="grande sec" for="in-archivo">📄 Imagen o PDF</label>
+    <button class="grande sec" data-pegar>📋 Pegar texto</button>
+  </div>
   <p class="suave" id="estado-ocr">Preparando el lector…</p>
   <div class="tarjeta">
+    <h2>Datos que se buscan</h2>
+    <p class="suave" id="resumen-vars"></p>
+    <button class="grande sec" id="b-variables">✎ Ver y añadir variables</button>
+  </div>
+  <div class="tarjeta">
     <h2>Exportar</h2>
-    <button class="grande sec" id="b-exportar">⬇︎ Exportar CSV</button>
+    <button class="grande sec" id="b-exportar">⬇︎ Descargar CSV de todos los informes</button>
     <button class="grande peligro" id="b-borrar-todo">Borrar todos los informes del móvil</button>
   </div>
-  <div class="tarjeta"><h2>Últimos informes</h2><table id="lista"></table></div>
+  <div class="tarjeta"><h2>Últimos informes</h2><ul class="lista" id="lista"></ul></div>
 </section>
 
-<!-- INFORME EN CURSO -->
-<section id="informe" hidden>
-  <div class="tarjeta">
-    <h2>Informe en curso</h2>
-    <ul class="paginas" id="paginas"></ul>
-    <div id="progreso" hidden><p class="suave" id="progreso-txt">Leyendo…</p><progress id="progreso-barra" max="1"></progress></div>
+<!-- SESIÓN DE ESCANEO -->
+<section id="sesion" hidden>
+  <div class="tarjeta encurso">
+    <div class="suave" id="encurso-etq">Informe en curso</div>
+    <div class="num" id="encurso-num">Informe 1</div>
+    <div id="encurso-fotos" class="fotos"></div>
+    <p class="suave" id="encurso-ayuda" style="margin-bottom:0">Haz todas las fotos de este informe. Cuando acabes, pulsa «Siguiente informe».</p>
   </div>
+  <button class="grande" data-video hidden>🎥 Modo vídeo</button>
   <div class="fila">
-    <label class="grande sec" for="in-foto">📷 Otra página</label>
-    <label class="grande sec" for="in-archivo">📄 Otra página</label>
+    <label class="grande sec" for="in-foto">📷 Foto</label>
+    <label class="grande sec" for="in-archivo">📄 Archivo</label>
     <button class="grande sec" data-pegar>📋 Texto</button>
   </div>
-  <button class="grande" id="b-revisar" disabled>Terminar y revisar ›</button>
-  <button class="grande sec" id="b-cancelar">Cancelar este informe</button>
+  <button class="grande sec" id="b-siguiente">➕ Siguiente informe</button>
+  <button class="grande" id="b-terminar">✓ Terminar y descargar CSV</button>
+  <p class="suave" id="cola-estado" aria-live="polite"></p>
+  <div class="tarjeta"><h2>Informes de esta sesión</h2><ul class="lista" id="lista-sesion"></ul></div>
 </section>
 
 <!-- PEGAR TEXTO -->
@@ -110,22 +156,81 @@ table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;bord
     <p class="suave">Copia el informe en el programa del hospital y pégalo aquí. No se guarda: solo se usa para sacar los datos.</p>
     <textarea id="texto-pegado" rows="12" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Texto del informe"></textarea>
   </div>
-  <button class="grande" id="b-usar-texto">Usar este texto ›</button>
+  <button class="grande" id="b-usar-texto">Añadir al informe ›</button>
   <button class="grande sec" id="b-cancelar-texto">Cancelar</button>
 </section>
 
-<!-- REVISIÓN -->
+<!-- REVISIÓN DE UN INFORME GUARDADO -->
 <section id="revision" hidden>
   <div class="tarjeta">
-    <h2>Revisa los datos</h2>
+    <h2 id="rev-titulo">Informe</h2>
     <div id="resumen"></div>
-    <p class="suave">Compáralos con el informe. Si algo está mal, corrígelo aquí antes de guardar.</p>
+    <p class="suave">Compáralos con el informe. Si algo está mal, corrígelo y guarda.</p>
     <div id="variables"></div>
   </div>
-  <details class="tarjeta"><summary>Ver el texto leído (ya anonimizado)</summary><pre id="texto"></pre></details>
-  <button class="grande" id="b-guardar">✓ Guardar informe</button>
-  <button class="grande sec" id="b-volver">‹ Añadir más páginas</button>
-  <button class="grande peligro" id="b-descartar">Descartar</button>
+  <button class="grande" id="b-guardar">✓ Guardar cambios</button>
+  <button class="grande sec" id="b-volver-rev">‹ Volver</button>
+</section>
+
+<!-- LISTA DE VARIABLES -->
+<section id="variables-pant" hidden>
+  <div class="tarjeta">
+    <h2>Variables</h2>
+    <p class="suave">Cada variable es una columna del CSV. Los cambios se aplican a lo que escanees a partir de ahora.</p>
+    <ul class="lista" id="lista-vars"></ul>
+    <button class="grande" id="b-nueva-var">➕ Añadir variable</button>
+  </div>
+  <div class="tarjeta">
+    <h2>Copias</h2>
+    <button class="grande sec" id="b-yaml-guardar">⬇︎ Guardar copia de las variables</button>
+    <label class="grande sec" for="in-yaml">⬆︎ Cargar variables desde archivo</label>
+    <input type="file" id="in-yaml" accept=".yaml,.yml,.txt,text/yaml,text/plain">
+    <button class="grande peligro" id="b-yaml-original">Volver a las variables de fábrica</button>
+  </div>
+  <button class="grande sec" id="b-volver-vars">‹ Volver</button>
+</section>
+
+<!-- EDITAR UNA VARIABLE -->
+<section id="variable-pant" hidden>
+  <form class="tarjeta" id="form-var" autocomplete="off">
+    <h2 id="var-titulo">Nueva variable</h2>
+    <label class="campo"><span>Nombre de la columna</span>
+      <input id="v-nombre" required placeholder="p. ej. cea_preoperatorio">
+      <small>Sin tildes ni espacios (se corrigen solos).</small></label>
+    <label class="campo"><span>Tipo de dato</span>
+      <select id="v-tipo">
+        <option value="numero">Número (mm, cm, ng/ml…)</option>
+        <option value="si_no">Sí / No (presente, ausente…)</option>
+        <option value="categoria">Una de varias opciones</option>
+        <option value="texto">Texto libre</option>
+      </select></label>
+    <label class="campo"><span>¿Cómo aparece en el informe?</span>
+      <textarea id="v-frases" rows="3" placeholder="CEA&#10;antigeno carcinoembrionario"></textarea>
+      <small id="v-frases-ayuda">Las palabras que van justo antes del dato. Si se escribe de varias formas, pon una por línea.</small></label>
+    <div id="v-bloque-numero">
+      <label class="campo"><span>Unidad (opcional)</span>
+        <input id="v-unidad" placeholder="mm, cm, ng/ml, %"><small>Si la pones, solo coge números seguidos de esa unidad.</small></label>
+      <div class="fila">
+        <label class="campo"><span>Mínimo</span><input id="v-min" inputmode="decimal"></label>
+        <label class="campo"><span>Máximo</span><input id="v-max" inputmode="decimal"></label>
+      </div>
+      <small class="suave">Valores fuera de ese rango se marcan como dudosos (errores de lectura).</small>
+    </div>
+    <label class="campo" id="v-bloque-opciones"><span>Opciones</span>
+      <textarea id="v-opciones" rows="4" placeholder="bien = bien diferenciado ; G1&#10;moderado = moderadamente diferenciado ; G2&#10;pobre = poco diferenciado ; G3"></textarea>
+      <small>Una por línea: <b>valor del CSV = palabras que lo indican</b>, separadas por «;».</small></label>
+    <label class="campo"><span>Descripción (opcional)</span><input id="v-desc"></label>
+    <details class="campo"><summary>Patrones avanzados (expresiones regulares)</summary>
+      <textarea id="v-patrones" rows="4" spellcheck="false"></textarea>
+      <small>Solo se usan si dejas vacío «¿Cómo aparece en el informe?». Marca el dato con (?P&lt;valor&gt;…).</small></details>
+    <div class="campo"><span>Probar</span>
+      <textarea id="v-prueba" rows="4" placeholder="Pega aquí una frase de un informe para ver qué saca."></textarea>
+      <button type="button" class="peq" id="b-probar" style="margin-top:6px">Probar</button>
+      <div id="v-resultado" class="suave" aria-live="polite"></div></div>
+    <button class="grande" type="submit">✓ Guardar variable</button>
+    <button class="grande sec" type="button" id="b-cancelar-var">Cancelar</button>
+    <button class="grande peligro" type="button" id="b-borrar-var">Borrar variable</button>
+  </form>
 </section>
 
 <!-- AJUSTES -->
@@ -136,16 +241,9 @@ table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;bord
     <p class="suave">Para informes en el móvil, una <b>captura de pantalla</b> es lo más fiable. Para papel o pantalla del ordenador: foto recta, sin reflejos, que el texto llene la imagen.</p>
   </div>
   <div class="tarjeta">
-    <h2>Variables</h2>
-    <p class="suave">En uso: <span id="origen-variables"></span> · <span id="n-variables"></span> variables.</p>
-    <label class="grande sec" for="in-yaml">Cargar variables.yaml</label>
-    <input type="file" id="in-yaml" accept=".yaml,.yml,text/yaml,text/plain">
-    <button class="grande sec" id="b-yaml-original">Volver a las variables de la app</button>
-  </div>
-  <div class="tarjeta">
     <h2>Probar la app</h2>
     <p class="suave">Informes inventados en texto corrido, con la solución debajo de cada uno. Ábrelos en otra pantalla y fotografíalos.</p>
-    <a class="grande sec" href="informes-prueba.html" target="_blank" rel="noopener" style="text-decoration:none">Ver informes de prueba</a>
+    <a class="grande sec" href="informes-prueba.html" target="_blank" rel="noopener">Ver informes de prueba</a>
   </div>
   <div class="tarjeta">
     <h2>Privacidad</h2>
@@ -166,6 +264,22 @@ table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;bord
     <button class="grande peligro" id="confirmar-si">Sí</button>
     <button class="grande sec" id="confirmar-no">Cancelar</button>
   </div>
+</div>
+<div id="camara" hidden role="dialog" aria-modal="true" aria-label="Escaneo en vídeo">
+  <div id="cam-arriba">
+    <div><div id="cam-info">Informe 1</div><div id="cam-fotos">0 páginas</div></div>
+    <label id="cam-auto"><input type="checkbox" id="cam-auto-op" checked> Automático</label>
+  </div>
+  <div style="position:relative;flex:1;min-height:0;display:flex"><video id="cam-video" playsinline muted></video><div id="cam-flash"></div></div>
+  <div id="cam-estado" class="espera" aria-live="polite">Abriendo la cámara…</div>
+  <div id="cam-abajo">
+    <button id="cam-capturar">📸 Capturar ahora</button>
+    <button id="cam-siguiente">➕ Siguiente informe</button>
+    <button id="cam-cerrar" style="grid-column:1/-1">✓ Salir del vídeo</button>
+  </div>
+</div>
+<div id="esperando" hidden role="dialog" aria-modal="true" aria-labelledby="esperando-txt">
+  <div class="tarjeta"><p id="esperando-txt" style="font-weight:600">Terminando de leer…</p><progress style="width:100%"></progress></div>
 </div>
 
 <script src="vendor/js-yaml.min.js"></script>

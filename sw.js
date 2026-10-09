@@ -1,14 +1,16 @@
 // Guarda la app en el móvil para que funcione sin internet. Solo cachea los archivos de la app, nunca datos.
-const VERSION = "ocrmed-v1";
+const VERSION = "ocrmed-v2"; // súbela en cada cambio para que los móviles descarguen la versión nueva
 const ARCHIVOS = [
-  "./", "index.html", "app.js", "extraer.js", "ocr.js", "almacen.js", "variables.yaml", "manifest.webmanifest",
+  "./", "index.html", "app.js", "extraer.js", "ocr.js", "almacen.js", "camara.js", "variables.yaml", "manifest.webmanifest",
   "icono.svg", "icono-180.png", "icono-512.png", "informes-prueba.html",
   "vendor/js-yaml.min.js", "vendor/tesseract.min.js", "vendor/worker.min.js", "vendor/pdf.min.js", "vendor/pdf.worker.min.js",
   "vendor/core/tesseract-core-simd-lstm.wasm.js", "vendor/core/tesseract-core-lstm.wasm.js", "vendor/lang/spa.traineddata.gz",
 ];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ARCHIVOS)).then(() => self.skipWaiting()));
+  // cache: "reload" evita coger copias viejas de la caché HTTP al instalar una versión nueva.
+  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ARCHIVOS.map((u) => new Request(u, { cache: "reload" }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (e) => {

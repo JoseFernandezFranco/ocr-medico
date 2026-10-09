@@ -27,7 +27,9 @@ async function operar(almacen, modo, fn) {
   });
 }
 
-export const guardarInforme = (inf) => operar("informes", "readwrite", (s) => s.add(inf));
+/** Crea (sin id) o actualiza (con id) un informe. Devuelve su id. */
+export const guardarInforme = (inf) => operar("informes", "readwrite", (s) => s.put(inf));
+export const obtenerInforme = (id) => operar("informes", "readonly", (s) => s.get(id));
 export const informes = () => operar("informes", "readonly", (s) => s.getAll());
 export const borrarInforme = (id) => operar("informes", "readwrite", (s) => s.delete(id));
 export const borrarTodo = () => operar("informes", "readwrite", (s) => s.clear());
