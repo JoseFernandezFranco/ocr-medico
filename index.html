@@ -175,6 +175,14 @@ pre{white-space:pre-wrap;font-size:12px;max-height:50vh;overflow:auto;background
 <!-- LISTA DE VARIABLES -->
 <section id="variables-pant" hidden>
   <div class="tarjeta">
+    <h2>Tipo de informe</h2>
+    <p class="suave">Elige qué variables buscar. Después puedes añadir o cambiar las que quieras.</p>
+    <div class="fila">
+      <button class="grande sec" data-conjunto="recto">Cáncer de recto</button>
+      <button class="grande sec" data-conjunto="mama">Patología mamaria</button>
+    </div>
+  </div>
+  <div class="tarjeta">
     <h2>Variables</h2>
     <p class="suave">Cada variable es una columna del CSV. Los cambios se aplican a lo que escanees a partir de ahora.</p>
     <ul class="lista" id="lista-vars"></ul>
@@ -185,7 +193,6 @@ pre{white-space:pre-wrap;font-size:12px;max-height:50vh;overflow:auto;background
     <button class="grande sec" id="b-yaml-guardar">⬇︎ Guardar copia de las variables</button>
     <label class="grande sec" for="in-yaml">⬆︎ Cargar variables desde archivo</label>
     <input type="file" id="in-yaml" accept=".yaml,.yml,.txt,text/yaml,text/plain">
-    <button class="grande peligro" id="b-yaml-original">Volver a las variables de fábrica</button>
   </div>
   <button class="grande sec" id="b-volver-vars">‹ Volver</button>
 </section>

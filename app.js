@@ -70,21 +70,55 @@ function chipsResumen(inf) {
 }
 
 // ---------- variables ----------
+// Conjuntos de variables que trae la app. variables.yaml lleva además el identificador (NHC) y las reglas
+// para ocultar datos personales, que valen para todos.
+const CONJUNTOS = {
+  recto: { nombre: "Cáncer de recto", archivo: "variables.yaml" },
+  mama: { nombre: "Patología mamaria", archivo: "variables-mama.yaml" },
+};
+let base = null; // variables.yaml de la app
+
 async function cargarConfig() {
+  base = window.jsyaml.load(await (await fetch("variables.yaml", { cache: "no-cache" })).text());
   const propio = await almacen.leerMeta("variables_yaml");
-  const yaml = propio || (await (await fetch("variables.yaml", { cache: "no-cache" })).text());
-  config = cargarVariables(yaml);
-  datosVars = window.jsyaml.load(yaml);
-  $("#resumen-vars").textContent = `${plural(config.variables.length, "variable", "variables")}: ` +
+  const datos = propio ? window.jsyaml.load(propio) : structuredClone(base);
+  // Las reglas de privacidad siempre las de la app: así llegan sus mejoras aunque hayas personalizado las variables.
+  datos.identificador = base.identificador;
+  datos.ocultar = base.ocultar;
+  config = cargarVariables(window.jsyaml.dump(datos, { lineWidth: -1, noRefs: true }));
+  datosVars = datos;
+  const conjunto = CONJUNTOS[(await almacen.leerMeta("conjunto")) || "recto"];
+  const cambios = (await almacen.leerMeta("conjunto_modificado")) ? " (con cambios tuyos)" : "";
+  $("#resumen-vars").textContent = `${conjunto.nombre}${cambios} · ${plural(config.variables.length, "variable", "variables")}: ` +
     config.variables.map((v) => v.nombre).join(", ") + ".";
 }
 
-/** Valida y guarda el conjunto de variables (lanza Error con un mensaje legible si algo falla). */
-async function guardarVariables(datos) {
+/** Valida y guarda las variables (lanza Error con un mensaje legible si algo falla). */
+async function guardarVariables(datos, { modificado = true } = {}) {
   const yaml = window.jsyaml.dump(datos, { lineWidth: -1, noRefs: true });
   cargarVariables(yaml); // valida antes de aceptar
   await almacen.escribirMeta("variables_yaml", yaml);
+  await almacen.escribirMeta("conjunto_modificado", modificado);
   await cargarConfig();
+}
+
+async function elegirConjunto(clave) {
+  const c = CONJUNTOS[clave];
+  const aviso1 = `¿Usar las variables de «${c.nombre}»? Sustituyen a las actuales` +
+    ((await almacen.leerMeta("conjunto_modificado")) ? ", incluidos tus cambios." : ".") +
+    " Si tienes informes del otro tipo, descarga antes su CSV.";
+  if (!(await confirmar(aviso1, "Sí, usar estas"))) return;
+  const vars = clave === "recto" ? base.variables
+    : window.jsyaml.load(await (await fetch(c.archivo, { cache: "no-cache" })).text()).variables;
+  try {
+    await guardarVariables({ ...structuredClone(base), variables: structuredClone(vars) }, { modificado: false });
+    await almacen.escribirMeta("conjunto", clave);
+    await cargarConfig();
+  } catch (err) {
+    return aviso("⚠️ " + err.message, 8000);
+  }
+  aviso(`✓ Variables de ${c.nombre}`);
+  pintarVariables();
 }
 
 // ---------- inicio ----------
@@ -498,7 +532,14 @@ $("#b-borrar-todo").addEventListener("click", async () => {
 // ---------- editor de variables ----------
 const TIPO_TXT = { numero: "número", si_no: "sí / no", categoria: "opciones", texto: "texto" };
 
-function pintarVariables() {
+async function pintarVariables() {
+  const actual = (await almacen.leerMeta("conjunto")) || "recto";
+  for (const b of document.querySelectorAll("[data-conjunto]")) {
+    const sel = b.dataset.conjunto === actual;
+    b.classList.toggle("sec", !sel);
+    b.setAttribute("aria-pressed", sel);
+    b.textContent = (sel ? "✓ " : "") + CONJUNTOS[b.dataset.conjunto].nombre;
+  }
   $("#lista-vars").innerHTML = datosVars.variables.map((v, i) => `<li><div class="info">
       <div class="titulo">${escapar(v.nombre)}</div>
       <div class="det"><span class="chip neutro">${TIPO_TXT[v.tipo || "texto"]}</span>${escapar(v.descripcion || (v.frases || []).join(" · "))}</div></div>
@@ -676,13 +717,9 @@ $("#in-yaml").addEventListener("change", async (e) => {
   pintarVariables();
 });
 
-$("#b-yaml-original").addEventListener("click", async () => {
-  if (!(await confirmar("¿Volver a las variables de fábrica? Se pierden las que hayas añadido.", "Sí, volver"))) return;
-  await almacen.borrarMeta("variables_yaml");
-  await cargarConfig();
-  aviso("✓ Variables de fábrica");
-  pintarVariables();
-});
+for (const b of document.querySelectorAll("[data-conjunto]")) {
+  b.addEventListener("click", () => elegirConjunto(b.dataset.conjunto));
+}
 
 // ---------- ajustes ----------
 $("#b-ajustes").addEventListener("click", () => mostrar("ajustes"));

@@ -1,0 +1,58 @@
+# Variables de PATOLOGÍA MAMARIA (ejemplo). Solo la lista de variables: el identificador (NHC) y las reglas
+# para ocultar datos personales se toman siempre de variables.yaml.
+# Formato: ver los comentarios de variables.yaml.
+
+variables:
+  - nombre: birads
+    descripcion: Categoría BI-RADS (si hay varias, p. ej. de estudios previos, queda como dudosa)
+    tipo: categoria
+    mayusculas: true
+    patrones:
+      - 'bi\W?rads\W{0,4}(?:categoria\W{0,3})?(?P<valor>[0-6][abc]?)\b'
+      - 'categoria\s+bi\W?rads\W{0,3}(?P<valor>[0-6][abc]?)\b'
+      - '\bbr\s?(?P<valor>[0-6][abc]?)\b'                         # «BR4C»
+
+  - nombre: tamano_nodulo_mm
+    descripcion: Tamaño del nódulo o lesión en mm (el mayor si hay varios)
+    tipo: numero
+    rango: [1, 200]
+    si_varios: maximo
+    patrones:
+      # «nódulo … de 21 x 15 mm»: la primera medida
+      - '(?:nodulos?|lesion|masa|tumor\w*)[^\n.]{0,60}?(?P<valor>\d+(?:[.,]\d+)?)\s*x\s*\d+(?:[.,]\d+)?\s*mm'
+      - '(?:nodulos?|lesion|masa|tumor\w*)[^\n.]{0,60}?(?P<valor>\d+(?:[.,]\d+)?)\s*mm'
+      - '(?P<valor>\d+(?:[.,]\d+)?)\s*mm[^\n\d.]{0,20}(?:nodulo|lesion|masa)'
+
+  - nombre: patron_mamario
+    descripcion: Densidad mamaria (A, B, C o D)
+    tipo: categoria
+    mayusculas: true
+    patrones:
+      - 'patron\s+(?:radiologico\s+)?(?:mamario\s+)?(?:tipo\s+)?(?P<valor>[a-d])\b'
+      - 'densas?\W{1,3}(?:patron\s+)?tipo\s+(?P<valor>[a-d])\b'
+
+  - nombre: fibroadenoma
+    descripcion: Se menciona fibroadenoma (y si se afirma o niega)
+    tipo: si_no
+    patrones:
+      - 'fibroadenomas?'
+
+  - nombre: microcalcificaciones
+    descripcion: Microcalcificaciones (sospechosas o no lo dirá la evidencia)
+    tipo: si_no
+    patrones:
+      - 'microcalcificaciones'
+
+  - nombre: adenopatias_axilares
+    descripcion: Adenopatías (axilares) de sospecha
+    tipo: si_no
+    patrones:
+      - 'adenopatias?'
+
+  - nombre: control_recomendado
+    descripcion: Periodicidad del siguiente control
+    tipo: categoria
+    opciones:
+      semestral: ['control\s+semestral', 'control\s+a\s+los\s+6\s+meses', 'en\s+6\s+meses']
+      anual: ['control\s+anual', 'estudio\s+anual', 'control\w*\s+anuales']
+      en_2_meses: ['en\s+2\s+meses', 'dentro\s+de\s+2\s+meses']

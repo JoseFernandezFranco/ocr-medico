@@ -10,6 +10,7 @@ const NEG_ANTES = /(?:\bno\b|\bsin\b|\bni\b|ausencia de|negativ[oa]s? (?:para|de
 const NEG_DESPUES = /^\W{0,3}(?:no\b|negativ|ausente|no identificad|no se (?:observa|identifica|objetiva|aprecia))/im;
 const POS_ANTES = /(?:presencia de|se (?:observa|identifica|objetiva|aprecia)n?|\bcon\b|positiv[oa]s? para)/im;
 const POS_DESPUES = /^\W{0,3}(?:si\b|presente|positiv|identificad|focal|extens)/im;
+const NEG_LISTA = /(?:\bno\s+se\s+(?:observa|identifica|objetiva|aprecia|visualiza|detecta)n?\b|\bsin\b|ausencia de|\bno hay\b)/gim;
 
 export function quitarTildes(texto) {
   return texto.normalize("NFKD").replace(/[̀-ͯ]/g, "");
@@ -168,6 +169,13 @@ function sentido(texto, m) {
   despues = despues.split(/[.;\n,(]/)[0];
   if (NEG_ANTES.test(antes) || NEG_DESPUES.test(despues)) return "no";
   if (POS_ANTES.test(antes) || POS_DESPUES.test(despues)) return "si";
+  // Enumeración negada: «No se identifican nódulos, microcalcificaciones agrupadas ni asimetrías».
+  const clausula = texto.slice(Math.max(0, ini - 150), ini).split(/[.;:\n()]/).pop();
+  const negaciones = [...clausula.matchAll(NEG_LISTA)];
+  if (negaciones.length) {
+    const ultima = negaciones[negaciones.length - 1];
+    if (!POS_ANTES.test(clausula.slice(ultima.index + ultima[0].length))) return "no";
+  }
   return null;
 }
 
