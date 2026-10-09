@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informes de prueba</title>
+<style>
+:root{--fondo:#e9ecf0;--texto:#18202b;--suave:#5f6b7a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fondo:#12161b;--texto:#e7eaee;--suave:#9aa5b1;color-scheme:dark}}
+:root[data-theme="dark"]{--fondo:#12161b;--texto:#e7eaee;--suave:#9aa5b1;color-scheme:dark}
+body{margin:0;background:var(--fondo);color:var(--texto);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.guia{max-width:780px;margin:0 auto;padding:16px}
+.guia h1{font-size:20px;margin:0 0 6px}
+.guia p{margin:6px 0;color:var(--suave)}
+/* El informe siempre en blanco, como en el programa del hospital, aunque el móvil esté en modo oscuro */
+.informe{background:#fff;color:#111;max-width:780px;margin:16px auto;padding:28px 32px;box-shadow:0 1px 4px rgba(0,0,0,.15);
+  font:16px/1.55 Arial,Helvetica,sans-serif}
+.cab{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:2px solid #1f4e79;padding-bottom:10px;margin-bottom:14px}
+.hosp{color:#1f4e79;font-weight:700}
+.hosp small{display:block;color:#555;font-weight:400}
+.pac{border:1px solid #333;padding:6px 10px;font-size:14px;line-height:1.5}
+.marca{color:#b42318;font-size:12px;font-weight:700;text-align:right;margin-bottom:6px}
+h2{font-size:16px;margin:14px 0 4px;color:#1f4e79}
+.pie{margin-top:18px;font-size:12px;color:#555;border-top:1px solid #ccc;padding-top:6px}
+details{max-width:780px;margin:0 auto 28px;padding:0 16px;color:var(--texto)}
+details table{border-collapse:collapse;font-size:14px;margin-top:6px}
+details td{padding:3px 10px;border-bottom:1px solid #bbb}
+@media (max-width:600px){.informe{padding:18px 16px;margin:12px 0}}
+</style>
+</head>
+<body>
+<div class="guia">
+  <h1>Informes de prueba (inventados)</h1>
+  <p>Ábrelos en el ordenador y fotografía cada informe con la app del móvil, o haz una captura de pantalla. Ningún dato es real.</p>
+  <p>Debajo de cada uno, en «Lo que debería salir», está la solución para comprobar la app.</p>
+</div>
+
+<article class="informe" data-esperado='{"distancia_margen_anal_cm":"7","tamano_tumor_mm":"38","estadio_T":"T3","estadio_N":"N1b","ganglios_afectados":"3","ganglios_aislados":"14","invasion_linfovascular":"no","invasion_perineural":"si","margen_circunferencial_mm":"3","grado_diferenciacion":"moderado"}'>
+  <div class="marca">DOCUMENTO DE PRUEBA · DATOS FICTICIOS</div>
+  <div class="cab">
+    <div class="hosp">HOSPITAL GENERAL DE PRUEBAS<small>Servicio de Anatomía Patológica</small></div>
+    <div class="pac">Paciente: FICTICIO CINCO, PACIENTE<br>NHC: 0061234 &nbsp; CIP: EJEM00000005<br>F. Nac.: 12/04/1958</div>
+  </div>
+  <p>Fecha del informe: 03/10/2026</p>
+  <h2>Informe</h2>
+  <p>Se recibe pieza de resección anterior baja de recto de 21 cm de longitud. Macroscópicamente se identifica una tumoración ulcerada de 38 mm de diámetro mayor, localizada a 7 cm del margen anal, que no contacta con los bordes quirúrgicos.</p>
+  <p>Microscópicamente corresponde a un adenocarcinoma moderadamente diferenciado que infiltra a través de la muscular propia hasta la grasa perirrectal. No se observa invasión linfovascular. Se identifica invasión perineural focal. El margen circunferencial se encuentra a 3 mm del frente de invasión.</p>
+  <p>Se aíslan 14 ganglios linfáticos, de los cuales 3 presentan metástasis de adenocarcinoma.</p>
+  <h2>Diagnóstico</h2>
+  <p>Adenocarcinoma de recto, estadificación pT3 pN1b (AJCC 8ª edición).</p>
+  <div class="pie">Validado por: Dra. Ejemplo Prueba · Documento ficticio sin validez</div>
+</article>
+<details><summary>Lo que debería salir</summary><table class="sol"></table></details>
+
+<article class="informe" data-esperado='{"distancia_margen_anal_cm":"9.5","tamano_tumor_mm":"42","estadio_T":"T3c","estadio_N":"N1","ganglios_afectados":"","ganglios_aislados":"","invasion_linfovascular":"","invasion_perineural":"","margen_circunferencial_mm":"1.5","grado_diferenciacion":""}'>
+  <div class="marca">DOCUMENTO DE PRUEBA · DATOS FICTICIOS</div>
+  <div class="cab">
+    <div class="hosp">HOSPITAL GENERAL DE PRUEBAS<small>Servicio de Radiodiagnóstico</small></div>
+    <div class="pac">Paciente: FICTICIO SEIS, PACIENTE<br>NHC: 0062345 &nbsp; CIP: EJEM00000006<br>F. Nac.: 30/09/1966</div>
+  </div>
+  <p>RM de pelvis para estadificación de neoplasia de recto. Fecha: 25/09/2026</p>
+  <h2>Hallazgos</h2>
+  <p>Estudio realizado con secuencias potenciadas en T2 de alta resolución en los tres planos y difusión. Se visualiza una tumoración de 42 mm de longitud craneocaudal en recto medio, cuyo polo inferior dista 9,5 cm del margen anal. La lesión sobrepasa la muscular propia con una extensión extramural de 4 mm.</p>
+  <p>La distancia mínima a la fascia mesorrectal (MRC) es de 1,5 mm, por lo que se considera amenazada. Se observan dos ganglios mesorrectales de morfología sospechosa. EMVI positiva.</p>
+  <h2>Conclusión</h2>
+  <p>Neoplasia de recto medio, estadio radiológico cT3c cN1. MRC amenazado.</p>
+  <div class="pie">Informe firmado por el Dr. Ejemplo Muestra · Documento ficticio sin validez</div>
+</article>
+<details><summary>Lo que debería salir</summary><table class="sol"></table></details>
+
+<article class="informe" data-esperado='{"distancia_margen_anal_cm":"12","tamano_tumor_mm":"35","estadio_T":"","estadio_N":"","ganglios_afectados":"","ganglios_aislados":"","invasion_linfovascular":"","invasion_perineural":"","margen_circunferencial_mm":"","grado_diferenciacion":""}'>
+  <div class="marca">DOCUMENTO DE PRUEBA · DATOS FICTICIOS</div>
+  <div class="cab">
+    <div class="hosp">HOSPITAL GENERAL DE PRUEBAS<small>Unidad de Endoscopia Digestiva</small></div>
+    <div class="pac">Paciente: FICTICIO CINCO, PACIENTE<br>NHC: 0061234 &nbsp; CIP: EJEM00000005<br>F. Nac.: 12/04/1958</div>
+  </div>
+  <p>Colonoscopia. Fecha: 02/08/2026. Preparación adecuada (Boston 8).</p>
+  <h2>Descripción</h2>
+  <p>Se introduce el endoscopio hasta ciego, identificando válvula ileocecal y orificio apendicular. A 12 cm del margen anal se observa una lesión excrecente, friable, de aproximadamente 35 mm, que ocupa un tercio de la circunferencia sin estenosar la luz. Se toman biopsias para estudio histológico. Resto de la exploración sin hallazgos significativos.</p>
+  <h2>Conclusión</h2>
+  <p>Neoplasia de recto superior. Pendiente de anatomía patológica y estudio de extensión.</p>
+  <div class="pie">Exploración realizada por el Dr. Ejemplo Ejemplo · Documento ficticio sin validez</div>
+</article>
+<details><summary>Lo que debería salir</summary><table class="sol"></table></details>
+
+<article class="informe" data-esperado='{"distancia_margen_anal_cm":"5","tamano_tumor_mm":"55","estadio_T":"T4a","estadio_N":"N2b","ganglios_afectados":"9","ganglios_aislados":"22","invasion_linfovascular":"si","invasion_perineural":"no","margen_circunferencial_mm":"0","grado_diferenciacion":"pobre"}'>
+  <div class="marca">DOCUMENTO DE PRUEBA · DATOS FICTICIOS</div>
+  <div class="cab">
+    <div class="hosp">HOSPITAL GENERAL DE PRUEBAS<small>Servicio de Anatomía Patológica</small></div>
+    <div class="pac">Paciente: FICTICIO OCHO, PACIENTE<br>NHC: 0068888 &nbsp; CIP: EJEM00000008<br>F. Nac.: 07/01/1949</div>
+  </div>
+  <p>Fecha del informe: 18/09/2026. Pieza quirúrgica tras tratamiento neoadyuvante.</p>
+  <h2>Informe</h2>
+  <p>Amputación abdominoperineal. El tumor mide 55 mm y se sitúa a 5 cm del margen anal, con infiltración del peritoneo visceral. Histológicamente se trata de un adenocarcinoma pobremente diferenciado (G3) con áreas de células en anillo de sello y escasa respuesta al tratamiento.</p>
+  <p>Presenta invasión linfovascular extensa. No se identifica invasión perineural. El margen circunferencial está afectado (0 mm). Se aíslan 22 ganglios linfáticos; ganglios afectados: 9.</p>
+  <h2>Diagnóstico</h2>
+  <p>Adenocarcinoma de recto, estadio patológico ypT4a ypN2b. Margen circunferencial afecto.</p>
+  <div class="pie">Validado por: Dra. Ejemplo Prueba · Documento ficticio sin validez</div>
+</article>
+<details><summary>Lo que debería salir</summary><table class="sol"></table></details>
+
+<script>
+for (const art of document.querySelectorAll(".informe")) {
+  const esperado = JSON.parse(art.dataset.esperado);
+  art.nextElementSibling.querySelector(".sol").innerHTML = Object.entries(esperado)
+    .map(([k, v]) => `<tr><td>${k}</td><td><b>${v || "(vacío)"}</b></td></tr>`).join("");
+}
+</script>
+</body>
+</html>

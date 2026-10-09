@@ -1,0 +1,105 @@
+# Variables a extraer. EJEMPLO para cáncer de recto: cámbialo por las tuyas.
+#
+# Cómo funciona:
+#   - Los patrones son expresiones regulares (https://regex101.com, modo "Python" para probarlas).
+#   - Da igual mayúsculas/minúsculas y tildes: "invasion" encuentra "Invasión".
+#   - En numero/texto/categoria sin opciones, marca el dato con (?P<valor>...).
+#   - \s = espacio o salto de línea · \d = dígito · [^\n] = cualquier cosa menos salto de línea
+#   - Números: (?P<valor>\d+(?:[.,]\d+)?) acepta 8, 8.5 y 8,5
+#
+# Tipos:
+#   numero    -> rango: [min, max] descarta lecturas absurdas del OCR (quedan como "dudoso")
+#   categoria -> con "opciones" (valor: [patrones]) o capturando (?P<valor>...)
+#   si_no     -> basta con el patrón de la mención; la negación ("no se observa", "sin", ": no",
+#                "negativa", "ausente"...) se detecta sola. Si no se menciona, queda VACÍO (no es un "no").
+#   texto     -> copia lo capturado
+#
+# si_varios (si aparecen valores distintos): dudoso (por defecto) | primero | ultimo | maximo | minimo
+#
+# Prueba los cambios sin cámara:  python -m ocrmed probar ejemplos/informe_ficticio.txt
+
+# Para reconocer al mismo paciente en varios informes sin guardar su NHC:
+# se guarda un seudónimo (HMAC con una clave que solo está en la Pi).
+identificador:
+  patron: '(?:NHC|N\.?\s?H\.?\s?C\.?|n[ºo°]?\s*historia(?:\s+clinica)?)\W{0,5}(?P<valor>\d{5,10})'
+
+# Se borra del texto ANTES de extraer nada y nunca se guarda (el NHC del identificador también).
+ocultar:
+  - '(?:paciente|nombre|apellidos?)\s*:[^\n]*?(?=\s+(?:NHC|N\.?H\.?C|historia|fecha|edad|sexo)\b|$)'
+  - '\b(?:DNI|NIF|NIE|CIP|SIP|NUSS|tarjeta sanitaria)\W{0,3}[A-Z0-9-]{5,}'
+  - '(?:fecha de nacimiento|f\.?\s?nac(?:imiento)?\.?)\W{0,3}[0-9/.-]{6,10}'
+  - '\b(?:dra?|dr)\.?\s+[a-z][\w.]*(?:\s+[a-z][\w.]*){0,3}'
+  - '(?:medico solicitante|validado (?:electronicamente )?por|firmado por)\W{0,3}[^\n]*'
+  - '(?:(?<![a-z])n[ºo°.?]*\s*(?:de\s+)?(?:estudio|biopsia|muestra|registro|col(?:egiado)?\.?)|codigo (?:seguro )?de verificacion)\W{0,3}[a-z0-9/-]+'
+  - '(?:direccion|domicilio|telefono|tlf\.?|movil)\W{0,3}[^\n]*'
+
+variables:
+  - nombre: distancia_margen_anal_cm
+    descripcion: Distancia del borde inferior del tumor al margen anal
+    tipo: numero
+    rango: [0, 25]
+    patrones:
+      - '(?P<valor>\d+(?:[.,]\d+)?)\s*cm\s+(?:del?\s+)?(?:margen anal|m\.?\s?a\.?\b)'
+      - '(?:margen anal|distancia al m\.?a\.?)[^\n\d]{0,30}(?P<valor>\d+(?:[.,]\d+)?)\s*cm'
+
+  - nombre: tamano_tumor_mm
+    descripcion: Diámetro mayor del tumor
+    tipo: numero
+    rango: [1, 200]
+    si_varios: maximo
+    patrones:
+      - '(?:tumor|tumoracion|lesion|neoplasia)[^\n.]{0,60}?(?P<valor>\d+(?:[.,]\d+)?)\s*mm'
+
+  - nombre: estadio_T
+    tipo: categoria
+    patrones:
+      # Con prefijo (cT2, pT3, ypT4a) o seguido de la N (T3N1): así "secuencias en T2" de la RM no cuenta.
+      - '(?<![a-z])(?:y?p|c|m?r)(?P<valor>T(?:[0-4][a-d]?|is|x))(?=N|\b)'
+      - '(?<![a-z])(?P<valor>T(?:[0-4][a-d]?|is|x))\s?N[0-3x]'
+      - '(?:estadio|estadificacion)\W{0,20}(?P<valor>T(?:[0-4][a-d]?|is|x))\b'
+
+  - nombre: estadio_N
+    tipo: categoria
+    patrones:
+      - '(?<![a-z])(?:y?p|c|m?r)?T(?:[0-4][a-d]?|is|x)\s?(?P<valor>N[0-3x][a-c]?)'
+      - '(?<![a-z])(?:y?p|c|m?r)(?P<valor>N[0-3x][a-c]?)(?![a-z0-9])'   # "pT3 pN1b" separados
+
+  - nombre: ganglios_afectados
+    tipo: numero
+    rango: [0, 80]
+    patrones:
+      - '(?P<valor>\d+)\s*(?:de|/)\s*\d+\s*ganglios?[^\n.]{0,30}(?:afect|metasta|positiv)'
+      - '(?:metasta\w*|afectacion)\s+(?:en\s+)?(?P<valor>\d+)\s*(?:de|/)\s*\d+\s*ganglios?'
+      - 'ganglios?[^\n.]{0,20}(?:afectados|metastasicos|positivos)\W{0,3}(?P<valor>\d+)'
+      - 'de los cuales\s+(?P<valor>\d+)\s+(?:presenta|muestra|contiene)n?\s+(?:metasta|afectacion|infiltracion|tumor)'
+
+  - nombre: ganglios_aislados
+    tipo: numero
+    rango: [0, 120]
+    patrones:
+      - '\d+\s*(?:de|/)\s*(?P<valor>\d+)\s*ganglios?'
+      - 'ganglios(?: linfaticos)?\s+(?:aislados|examinados|estudiados)\W{0,3}(?P<valor>\d+)'
+      - 'se (?:aislan|identifican|disecan|obtienen)\s+(?P<valor>\d+)\s+ganglios'
+
+  - nombre: invasion_linfovascular
+    tipo: si_no
+    patrones:
+      - 'invasion\s+(?:linfovascular|vascular|linfatica)'
+
+  - nombre: invasion_perineural
+    tipo: si_no
+    patrones:
+      - '(?:invasion\s+)?perineural'
+
+  - nombre: margen_circunferencial_mm
+    tipo: numero
+    rango: [0, 100]
+    patrones:
+      - '(?:margen circunferencial|\bmrc\b|\bcrm\b)[^\d.;]{0,40}(?P<valor>\d+(?:[.,]\d+)?)\s*mm'   # puede saltar de línea: "(MRC)\nde 6 mm"
+
+  - nombre: grado_diferenciacion
+    tipo: categoria
+    opciones:
+      bien: ['bien diferenciado', 'bajo grado', '\bG1\b']
+      moderado: ['moderadamente diferenciado', '\bG2\b']
+      pobre: ['poco diferenciado', 'pobremente diferenciado', 'alto grado', '\bG3\b']

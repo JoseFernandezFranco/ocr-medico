@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f4e79">
+<meta name="referrer" content="no-referrer">
+<title>OCR médico</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icono.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icono-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--fondo:#f3f5f8;--panel:#fff;--texto:#18202b;--suave:#5f6b7a;--borde:#d8dee6;--primario:#1f4e79;--primario-txt:#fff;
+  --ok:#137a45;--ok-fondo:#e3f4ea;--duda:#9a5300;--duda-fondo:#fdf0dc;--no:#b42318;--no-fondo:#fde8e6;--corr:#3a4fb0;--corr-fondo:#e7eafb}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fondo:#12161b;--panel:#1b2128;--texto:#e7eaee;--suave:#9aa5b1;--borde:#2c343e;--primario:#4f8fd0;--primario-txt:#0b1520;
+  --ok:#4cc38a;--ok-fondo:#15301f;--duda:#f5a524;--duda-fondo:#33260f;--no:#f97066;--no-fondo:#3a1715;--corr:#8fa2ff;--corr-fondo:#1f2547;color-scheme:dark}}
+:root[data-theme="dark"]{--fondo:#12161b;--panel:#1b2128;--texto:#e7eaee;--suave:#9aa5b1;--borde:#2c343e;--primario:#4f8fd0;--primario-txt:#0b1520;
+  --ok:#4cc38a;--ok-fondo:#15301f;--duda:#f5a524;--duda-fondo:#33260f;--no:#f97066;--no-fondo:#3a1715;--corr:#8fa2ff;--corr-fondo:#1f2547;color-scheme:dark}
+#confirmar{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+#confirmar[hidden]{display:none}
+#confirmar .tarjeta{max-width:420px;width:100%;margin:0}
+button:focus-visible,label:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--primario);outline-offset:2px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{background:var(--primario);color:var(--primario-txt);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:18px;margin:0}
+header button{background:none;border:0;color:inherit;font-size:15px;padding:6px}
+main{max-width:640px;margin:0 auto;padding:16px}
+section[hidden]{display:none}
+.tarjeta{background:var(--panel);border:1px solid var(--borde);border-radius:12px;padding:16px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 10px}
+.cifra{font-size:34px;font-weight:700;line-height:1}
+.suave{color:var(--suave);font-size:14px}
+button.grande,label.grande,a.grande{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border-radius:12px;border:0;
+  font-size:17px;font-weight:600;background:var(--primario);color:var(--primario-txt);margin:8px 0;cursor:pointer;text-align:center}
+button.sec,label.sec{background:var(--panel);color:var(--texto);border:1px solid var(--borde)}
+button.peligro{background:var(--no-fondo);color:var(--no);border:1px solid var(--no)}
+button:disabled{opacity:.5}
+input[type=file]{display:none}
+.fila{display:flex;gap:8px}.fila>*{flex:1}
+ul.paginas{list-style:none;padding:0;margin:0}
+ul.paginas li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--borde);gap:8px}
+.chip{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.ok{color:var(--ok);background:var(--ok-fondo)}.dudoso{color:var(--duda);background:var(--duda-fondo)}
+.no_encontrado{color:var(--no);background:var(--no-fondo)}.corregido{color:var(--corr);background:var(--corr-fondo)}
+.aviso{border-radius:10px;padding:12px;margin:10px 0;font-weight:600}
+.var{padding:12px 0;border-bottom:1px solid var(--borde)}
+.var:last-child{border-bottom:0}
+.var .cab{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.var .nombre{font-weight:600;font-size:15px;word-break:break-word}
+.var input{width:100%;font-size:18px;padding:8px 10px;margin:6px 0 4px;border:1px solid var(--borde);border-radius:8px;background:var(--fondo);color:var(--texto)}
+.var .evid{font-size:13px;color:var(--suave);word-break:break-word}
+textarea{width:100%;font:15px/1.4 inherit;padding:10px;border:1px solid var(--borde);border-radius:8px;background:var(--fondo);color:var(--texto)}
+pre{white-space:pre-wrap;font-size:12px;max-height:50vh;overflow:auto;background:var(--fondo);padding:10px;border-radius:8px}
+progress{width:100%;height:10px}
+#toast{position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));max-width:600px;margin:0 auto;background:var(--texto);color:var(--fondo);
+  padding:14px 16px;border-radius:12px;font-weight:600;text-align:center;opacity:0;transform:translateY(20px);transition:.25s;pointer-events:none}
+#toast.ver{opacity:1;transform:none}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;border-bottom:1px solid var(--borde)}
+.interruptor{display:flex;align-items:center;gap:10px;padding:8px 0}
+.interruptor input{width:22px;height:22px}
+</style>
+</head>
+<body>
+<header><h1>OCR médico</h1><button id="b-ajustes" aria-label="Ajustes">⚙︎ Ajustes</button></header>
+<main>
+
+<!-- INICIO -->
+<section id="inicio">
+  <div class="tarjeta">
+    <div class="fila" style="align-items:flex-end">
+      <div><div class="cifra" id="n-informes">0</div><div class="suave">informes guardados</div></div>
+      <div><div class="cifra" id="n-dudas">0</div><div class="suave">con datos a revisar</div></div>
+    </div>
+  </div>
+  <label class="grande" for="in-foto">📷 Nuevo informe: hacer foto</label>
+  <label class="grande sec" for="in-archivo">📄 Desde captura, imagen o PDF</label>
+  <button class="grande sec" data-pegar>📋 Pegar texto del informe</button>
+  <p class="suave" id="estado-ocr">Preparando el lector…</p>
+  <div class="tarjeta">
+    <h2>Exportar</h2>
+    <button class="grande sec" id="b-exportar">⬇︎ Exportar CSV</button>
+    <button class="grande peligro" id="b-borrar-todo">Borrar todos los informes del móvil</button>
+  </div>
+  <div class="tarjeta"><h2>Últimos informes</h2><table id="lista"></table></div>
+</section>
+
+<!-- INFORME EN CURSO -->
+<section id="informe" hidden>
+  <div class="tarjeta">
+    <h2>Informe en curso</h2>
+    <ul class="paginas" id="paginas"></ul>
+    <div id="progreso" hidden><p class="suave" id="progreso-txt">Leyendo…</p><progress id="progreso-barra" max="1"></progress></div>
+  </div>
+  <div class="fila">
+    <label class="grande sec" for="in-foto">📷 Otra página</label>
+    <label class="grande sec" for="in-archivo">📄 Otra página</label>
+    <button class="grande sec" data-pegar>📋 Texto</button>
+  </div>
+  <button class="grande" id="b-revisar" disabled>Terminar y revisar ›</button>
+  <button class="grande sec" id="b-cancelar">Cancelar este informe</button>
+</section>
+
+<!-- PEGAR TEXTO -->
+<section id="pegar" hidden>
+  <div class="tarjeta">
+    <h2>Pegar el texto del informe</h2>
+    <p class="suave">Copia el informe en el programa del hospital y pégalo aquí. No se guarda: solo se usa para sacar los datos.</p>
+    <textarea id="texto-pegado" rows="12" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Texto del informe"></textarea>
+  </div>
+  <button class="grande" id="b-usar-texto">Usar este texto ›</button>
+  <button class="grande sec" id="b-cancelar-texto">Cancelar</button>
+</section>
+
+<!-- REVISIÓN -->
+<section id="revision" hidden>
+  <div class="tarjeta">
+    <h2>Revisa los datos</h2>
+    <div id="resumen"></div>
+    <p class="suave">Compáralos con el informe. Si algo está mal, corrígelo aquí antes de guardar.</p>
+    <div id="variables"></div>
+  </div>
+  <details class="tarjeta"><summary>Ver el texto leído (ya anonimizado)</summary><pre id="texto"></pre></details>
+  <button class="grande" id="b-guardar">✓ Guardar informe</button>
+  <button class="grande sec" id="b-volver">‹ Añadir más páginas</button>
+  <button class="grande peligro" id="b-descartar">Descartar</button>
+</section>
+
+<!-- AJUSTES -->
+<section id="ajustes" hidden>
+  <div class="tarjeta">
+    <h2>Lectura</h2>
+    <label class="interruptor"><input type="checkbox" id="op-pantalla"> Fotografío una pantalla (suaviza las rayas)</label>
+    <p class="suave">Para informes en el móvil, una <b>captura de pantalla</b> es lo más fiable. Para papel o pantalla del ordenador: foto recta, sin reflejos, que el texto llene la imagen.</p>
+  </div>
+  <div class="tarjeta">
+    <h2>Variables</h2>
+    <p class="suave">En uso: <span id="origen-variables"></span> · <span id="n-variables"></span> variables.</p>
+    <label class="grande sec" for="in-yaml">Cargar variables.yaml</label>
+    <input type="file" id="in-yaml" accept=".yaml,.yml,text/yaml,text/plain">
+    <button class="grande sec" id="b-yaml-original">Volver a las variables de la app</button>
+  </div>
+  <div class="tarjeta">
+    <h2>Probar la app</h2>
+    <p class="suave">Informes inventados en texto corrido, con la solución debajo de cada uno. Ábrelos en otra pantalla y fotografíalos.</p>
+    <a class="grande sec" href="informes-prueba.html" target="_blank" rel="noopener" style="text-decoration:none">Ver informes de prueba</a>
+  </div>
+  <div class="tarjeta">
+    <h2>Privacidad</h2>
+    <p class="suave">Todo se procesa en este móvil, sin internet. No se guardan fotos ni el texto del informe: solo los valores
+      extraídos y el fragmento de donde salen (anonimizado). El paciente se guarda como un código (seudónimo) creado con una
+      clave que solo existe en este móvil.</p>
+  </div>
+  <button class="grande" id="b-cerrar-ajustes">‹ Volver</button>
+</section>
+</main>
+
+<input type="file" id="in-foto" accept="image/*" capture="environment">
+<input type="file" id="in-archivo" accept="image/*,application/pdf" multiple>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="confirmar" hidden role="dialog" aria-modal="true" aria-labelledby="confirmar-txt">
+  <div class="tarjeta">
+    <p id="confirmar-txt" style="font-weight:600;margin-top:0"></p>
+    <button class="grande peligro" id="confirmar-si">Sí</button>
+    <button class="grande sec" id="confirmar-no">Cancelar</button>
+  </div>
+</div>
+
+<script src="vendor/js-yaml.min.js"></script>
+<script src="vendor/tesseract.min.js"></script>
+<script src="vendor/pdf.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
