@@ -520,11 +520,22 @@ const lineas = (s) => s.split("\n").map((l) => l.trim()).filter(Boolean);
 const NUM = "(?P<valor>\\d+(?:[.,]\\d+)?)";
 
 function patronesDesdeFrases(tipo, frases, unidad) {
-  return frases.map((f) => {
+  return frases.flatMap((f) => {
     const e = escRe(f);
-    if (tipo === "numero") return `${e}[^\\n\\d]{0,40}${NUM}` + (unidad ? `\\s*${escRe(unidad)}` : "");
-    if (tipo === "si_no") return e;
-    return `${e}\\W{0,5}(?P<valor>[^\\n.;]{1,80})`; // texto (o categoría sin opciones)
+    if (tipo === "numero") {
+      // Sin unidad: el primer número detrás de las palabras ("CEA: 4,2").
+      if (!unidad) return [`${e}[^\\n\\d]{0,40}${NUM}`];
+      const u = `\\s*${escRe(unidad)}`;
+      return [
+        // Número detrás: "Distancia al margen anal: 8 cm", "tumoración de 38 mm"; salta cifras con otra
+        // unidad ("tumor a 5 cm del margen, de 40 mm").
+        `${e}[^\\n.]{0,60}?${NUM}${u}`,
+        // Número delante: "a 8 cm del margen anal". Solo con unidad, para no confundir recuentos ("14 ganglios").
+        `${NUM}${u}[^\\n\\d.]{0,20}${e}`,
+      ];
+    }
+    if (tipo === "si_no") return [e];
+    return [`${e}\\W{0,5}(?P<valor>[^\\n.;]{1,80})`]; // texto (o categoría sin opciones)
   });
 }
 
