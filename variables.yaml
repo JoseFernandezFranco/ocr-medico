@@ -24,14 +24,36 @@ identificador:
   patron: '(?:NHC|N\.?\s?H\.?\s?C\.?|n[ºo°]?\s*historia(?:\s+clinica)?)\W{0,5}(?P<valor>\d{5,10})'
 
 # Se borra del texto ANTES de extraer nada y nunca se guarda (el NHC del identificador también).
+# Dos defensas: (1) líneas enteras con etiquetas de cabecera, porque las cabeceras en tabla salen del OCR
+# desordenadas y con erratas («Apelildo», «E-Nac»); (2) datos por su forma, estén donde estén.
 ocultar:
-  - '(?:paciente|nombre|apellidos?)\s*:[^\n]*?(?=\s+(?:NHC|N\.?H\.?C|historia|fecha|edad|sexo)\b|$)'
+  # --- 0. Bloque de cabecera de cada página: desde el principio hasta la ÚLTIMA línea (de las 25 primeras) con
+  # una etiqueta típica de la tabla del paciente. Así caen también los valores que el OCR separa de su
+  # etiqueta («| APELLIDO Nc 10.»). Solo etiquetas que no aparecen en el texto clínico.
+  - '(?<![\s\S])(?:[^\n]*\n){0,25}[^\n]*(?:\bnhc\b|\bap\w{0,2}l\w{0,3}dos?\b|\bdni\b|\bcip\w*|\bnss\b|\bnac\b|domic\w*|poblacion|provincia|n\W{0,2}\s?acto\b|\bh\.\s?cita|f\.\s?consulta|id\s*peticion|ubicacion del paciente)[^\n]*'
+  # --- 1. Líneas de cabecera / pie con datos personales (se borra la línea completa) ---
+  - '^[^\n]*(?:\bnombre\b|\bnom[a-z]?[o0]?r[e3]\b|\bap\w{0,2}l\w{0,3}dos?\b|\bdni\b|\bnie\b|\bnif\b|pasaporte|\bcip\w*|\bsip\b|\bnuss?\b|\bsexo\b|\bnac\b|nacimiento|\bedad\b\s*[:(|)]|domicilio|direccion|\bcalle\b|poblacion|provincia|localidad|telefonos?\b|\btelf?\b|\btlf\b|n\W{0,2}\s?acto\b|\bh\.\s?cita|f\.\s?consulta|id\s*peticion|\bcias\b|\bcol\.\s*n|colegiado|\bfdo\b|firmado|validado|ubicacion del paciente|centro de procedencia)[^\n]*'
+  # Pie con los nombres en la línea siguiente a la etiqueta («Centro de Salud: | Enfermera… | Médico…»)
+  # (el pie va al final de la página: se borran también las líneas siguientes, donde el OCR deja los valores)
+  - '^[^\n]*(?:centro de salud|\bsalud\s*:|enfermera|medico de a\W{0,2}\s*primaria|procedencia)[^\n]*(?:\n[^\n]*){0,4}'
+  # Domicilio: el valor suele ocupar dos líneas («Calle …,» / «22 1º C»)
+  - '^[^\n]*(?:domic\w*|\bcalle\b|\bavda\b|\bavenida\b)[^\n]*(?:\n[^\n]*)?'
+  - '^[^\n]*\bc\.\s?s\.\s[^\n]*'                                     # «C.S. <centro de salud>»
+  # --- 2. Datos por su forma ---
   - '\b(?:DNI|NIF|NIE|CIP|SIP|NUSS|tarjeta sanitaria)\W{0,3}[A-Z0-9-]{5,}'
+  - '\b[XYZ]?\d{7,8}\s?-?[A-Z]\b'                                  # DNI / NIE
+  - '(?<![\d/])[6789]\d{8}(?!\d)'                                   # teléfonos
+  - '(?<!\d)[6789]\d{2}[ .]\d{3}[ .]\d{3}(?!\d)'
+  - '\b\d{2}\s?/\s?\d{7,10}\b'                                      # NSS
+  - '(?<![\d,.])\d{8,}(?![\d,.])'                                   # cualquier número de 8+ cifras (ID, colegiado…)
+  - '\b(?=[a-z]*\d)(?=\d*[a-z])[a-z0-9]{10,}\b'                     # códigos con letras y cifras (CIP, CIAS, huellas)
+  - '\b\d{1,2}\s?[/.-]\s?\d{1,2}\s?[/.-]\s?19\d{2}\b'               # fechas de nacimiento (años 19xx)
+  - '(?:paciente|nombre|apellidos?)\s*:[^\n]*?(?=\s+(?:NHC|N\.?H\.?C|historia|fecha|edad|sexo)\b|$)'
   - '(?:fecha de nacimiento|f\.?\s?nac(?:imiento)?\.?)\W{0,3}[0-9/.-]{6,10}'
-  - '\b(?:dra?|dr)\.?\s+[a-z][\w.]*(?:\s+[a-z][\w.]*){0,3}'
+  - '\bdra?\.?(?:\s*/\s*dra?\.?)?\s+[a-z][\w.]*(?:\s+[a-z][\w.]*){0,3}(?:\s*,\s*[a-z]+)?'   # «Dr./Dra. Apellido Apellido, Nombre»
   - '(?:medico solicitante|validado (?:electronicamente )?por|firmado por)\W{0,3}[^\n]*'
   - '(?:(?<![a-z])n[ºo°.?]*\s*(?:de\s+)?(?:estudio|biopsia|muestra|registro|col(?:egiado)?\.?)|codigo (?:seguro )?de verificacion)\W{0,3}[a-z0-9/-]+'
-  - '(?:direccion|domicilio|telefono|tlf\.?|movil)\W{0,3}[^\n]*'
+  - '(?:direccion|domicilio|telefono|tlf\.?)\W{0,3}[^\n]*'
 
 variables:
   - nombre: distancia_margen_anal_cm

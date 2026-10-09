@@ -208,7 +208,8 @@ async function finalizar(inf) {
     if (p.paciente) pacientes.add(p.paciente);
   }
   if (pacientes.size > 1) avisos.push("fotos con NHC distintos");
-  const texto = anonimizar(buenas.map((p) => p.texto).join("\n\n"), config.identificador, config.ocultar);
+  // Página a página: cada foto tiene su propia cabecera con los datos del paciente.
+  const texto = buenas.map((p) => anonimizar(p.texto, config.identificador, config.ocultar)).join("\n\n");
   const registro = {
     creado: inf.creado, lote: sesion.lote, num: inf.num, paginas: inf.paginas.length,
     paciente: [...pacientes][0] || "", avisos, resultados: extraer(texto, config.variables),
